@@ -11,6 +11,7 @@ library('inTrees')
 library('dplyr')
 library('Matrix')
 library('caTools')
+library('xgboost')
 ```
 
 ## Reading the data
@@ -46,5 +47,75 @@ sample = sample.split(shrooms, SplitRatio = 0.75)
 train1 = subset(shrooms, sample == TRUE)
 test1 = subset(shrooms, sample == FALSE)
 ```
+Our output variable is in the first column (class)
+```{r}
+output_vector = train1[, 1]
+```
+For future accuracy testing
+```{r}
+real_output = test1[, 1]
+```
+Our model is classifying into two classes (poisonous or edible)
+```{r}
+number_classes = 2
+```
+### Making the model
+```{r}
+xgbmodel = xgboost(
+  data = data.matrix(train1[, -1]),
+  label = output_vector,
+  nfold = 100,
+  max.depth = 4,
+  nrounds = 10,
+  eta = 1,
+  nthread = 4,
+  objective = 'multi:softprob',
+  num_class = number_classes
+)
+```
+
+### Testing Model Accuracy
+
+**Finding model predictions**
+```{r}
+pred <- predict(xgbmodel, data.matrix(test1[, -1]))
+```
+Rounding because we need 0 or 1 values (binary classification)
+```{r}
+pred <- lapply(pred, round)
+```
+Finding the sum of all places where prediction is the same as the real output, and getting accuracy by simple division
+```{r}
+print(sum(pred == real_output) / length(real_output) * 100)
+```
+We get pretty high accuracy on our model. 
+
+**Let us see if the rules extracted from this model (using inTrees) give a comparable accuracy**
+
+Now we know that our model is performing well, but if someone wants to know *why* a mushroom is poisonous, what do we say?
+
+We can use feature importance, and also use inTrees to see the exact rules that are defining the tree ensemble used by XGBoost.
+
+#### Finding feature importance
+```{r}
+importance <-
+  xgb.importance(feature_names = colnames(data.matrix(train1[, -1])), model = xgbmodel)
+print(head(importance))
+```
 
 
+## Using inTrees
+
+#### Making a tree list from the XGB model:
+```{r}
+tree_list = XGB2List(xgbmodel, data.matrix(train1[, -1]))
+```
+**Extracting rules from the tree list:**
+```{r}
+exec = extractRules(tree_list, data.matrix(train1[, -1]))
+```
+**Getting rule metrics from the rules:**
+```{r}
+ruleMetric <-
+  getRuleMetric(exec, data.matrix(train1[, -1]), output_vector)
+```
