@@ -1,6 +1,7 @@
 library('inTrees')
 library('dplyr')
 library('Matrix')
+library('caTools')
 shrooms = read.csv('mushrooms.csv')
 shrooms = na.omit(shrooms)
 
