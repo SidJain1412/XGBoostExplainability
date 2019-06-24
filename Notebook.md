@@ -170,9 +170,95 @@ exec = extractRules(tree_list, data.matrix(train1[, -1]))
 
     ## 188 rules (length<=6) were extracted from the first 20 trees.
 
-**Getting rule metrics from the rules:**
+**Getting rule metrics from the
+rules:**
 
 ``` r
-ruleMetric <-
-  getRuleMetric(exec, data.matrix(train1[, -1]), output_vector)
+ruleMetric <- getRuleMetric(exec, data.matrix(train1[, -1]), output_vector)
+knitr::kable(head(ruleMetric), floating.environment="sidewaystable")
 ```
+
+| len | freq  | err   | condition                                                      | pred |
+| :-- | :---- | :---- | :------------------------------------------------------------- | :--- |
+| 3   | 0.006 | 0     | X\[,9\]\<=4.5 & X\[,20\]\<=2.5 & X\[,21\]\<=4.5                | 0    |
+| 4   | 0.061 | 0     | X\[,8\]\<=1.5 & X\[,9\]\<=4.5 & X\[,20\]\>2.5 & X\[,21\]\<=4.5 | 1    |
+| 4   | 0.003 | 0     | X\[,8\]\>1.5 & X\[,9\]\<=4.5 & X\[,20\]\>2.5 & X\[,21\]\<=4.5  | 0    |
+| 4   | 0.004 | 0.375 | X\[,9\]\<=4.5 & X\[,11\]\<=3 & X\[,13\]\<=1.5 & X\[,21\]\>4.5  | 0    |
+| 4   | 0.33  | 0     | X\[,9\]\<=4.5 & X\[,11\]\<=3 & X\[,13\]\>1.5 & X\[,21\]\>4.5   | 0    |
+| 3   | 0.003 | 0     | X\[,9\]\<=4.5 & X\[,11\]\>3 & X\[,21\]\>4.5                    | 1    |
+
+Rule Metric explanation:
+
+  - len: No. of variable-value pairs in that condition
+  - freq: %age of data satisfying the condition
+  - pred: Outcome
+  - err: Error
+rate
+
+#### Pruning the rules generated. This removes repeated, redundant rules
+
+``` r
+ruleMetric2 <- pruneRule(ruleMetric, data.matrix(train1[, -1]), output_vector)
+```
+
+#### Selecting the important rules using a regularized random forest (refer paper for formulae)
+
+``` r
+ruleMetric3 <- selectRuleRRF(ruleMetric2, data.matrix(train1[, -1]), output_vector)
+```
+
+This step greatly reduces the number of rules by only selecting the
+important
+ones.
+
+### Building a learner based on our rules. We can use this to predict values and see accuracy of our extracted rules
+
+``` r
+learner <- buildLearner(ruleMetric3, data.matrix(train1[, -1]), output_vector)
+knitr::kable(learner, floating.environment="sidewaystable")
+```
+
+| len | freq               | err                | condition                     | pred |
+| :-- | :----------------- | :----------------- | :---------------------------- | :--- |
+| 1   | 0.0494670219853431 | 0                  | X\[,5\]\<=1.5                 | 1    |
+| 2   | 0.445036642238508  | 0.0295658682634731 | X\[,8\]\<=1.5 & X\[,20\]\>2.5 | 1    |
+| 1   | 0.505496335776149  | 0.0688632619439868 | X\[,1\]==X\[,1\]              | 0    |
+
+### Using the learner to predict values:
+
+``` r
+applied <- applyLearner(learner, data.matrix(test1[, -1]))
+```
+
+**Checking the accuracy of this learner built from the rules:**
+
+``` r
+print(sum(real_output == applied) / length(real_output) * 100)
+```
+
+    ## [1] 94.90566
+
+**We get around 95% accuracy, which is pretty good for such a small
+number of rules**
+
+Our learner doesn’t have condition names, adding those to make it human
+readable (using presentRules)
+
+``` r
+Simp_Learner <- presentRules(ruleMetric3, colnames(train1[, -1]))
+knitr::kable(Simp_Learner, floating.environment="sidewaystable")
+```
+
+| len | freq  | err   | condition                                                           | pred | impRRF             |
+| :-- | :---- | :---- | :------------------------------------------------------------------ | :--- | :----------------- |
+| 2   | 0.489 | 0.027 | gill.size\<=1.5 & spore.print.color\>2.5                            | 1    | 1                  |
+| 2   | 0.486 | 0.039 | odor\>3.5 & odor\<=6.5                                              | 1    | 0.133311082662759  |
+| 3   | 0.009 | 0     | gill.spacing\<=1.5 & spore.print.color\>5.5 & spore.print.color\<=7 | 0    | 0.0429142607796045 |
+| 2   | 0.009 | 0     | stalk.surface.below.ring\>3.5 & ring.type\<=4.5                     | 0    | 0.0402593115954764 |
+| 1   | 0.049 | 0     | odor\<=1.5                                                          | 1    | 0.024454536802662  |
+
+**Hence we have used the inTrees library to easily understand the rules
+defining a decision for an XGBoost ensemble model.**
+
+Thank [Houtao Deng](https://www.linkedin.com/in/houtao-d-48902711/) for
+the inTrees library

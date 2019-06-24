@@ -116,6 +116,56 @@ exec = extractRules(tree_list, data.matrix(train1[, -1]))
 ```
 **Getting rule metrics from the rules:**
 ```{r}
-ruleMetric <-
-  getRuleMetric(exec, data.matrix(train1[, -1]), output_vector)
+ruleMetric <- getRuleMetric(exec, data.matrix(train1[, -1]), output_vector)
+knitr::kable(head(ruleMetric), floating.environment="sidewaystable")
 ```
+
+
+Rule Metric explanation:
+
+* len: No. of variable-value pairs in that condition
+* freq: %age of data satisfying the condition
+* pred: Outcome
+* err: Error rate
+
+
+#### Pruning the rules generated. This removes repeated, redundant rules
+```{r}
+ruleMetric2 <- pruneRule(ruleMetric, data.matrix(train1[, -1]), output_vector)
+```
+
+#### Selecting the important rules using a regularized random forest (refer paper for formulae)
+```{r}
+ruleMetric3 <- selectRuleRRF(ruleMetric2, data.matrix(train1[, -1]), output_vector)
+```
+This step greatly reduces the number of rules by only selecting the important ones.
+
+
+### Building a learner based on our rules. We can use this to predict values and see accuracy of our extracted rules
+```{r}
+learner <- buildLearner(ruleMetric3, data.matrix(train1[, -1]), output_vector)
+knitr::kable(learner, floating.environment="sidewaystable")
+```
+
+### Using the learner to predict values:
+```{r}
+applied <- applyLearner(learner, data.matrix(test1[, -1]))
+```
+**Checking the accuracy of this learner built from the rules:**
+```{r}
+print(sum(real_output == applied) / length(real_output) * 100)
+```
+**We get around 95% accuracy, which is pretty good for such a small number of rules**
+
+Our learner doesn't have condition names, adding those to make it human readable (using presentRules)
+
+```{r}
+Simp_Learner <- presentRules(ruleMetric3, colnames(train1[, -1]))
+knitr::kable(Simp_Learner, floating.environment="sidewaystable")
+```
+
+**Hence we have used the inTrees library to easily understand the rules defining a decision for an XGBoost ensemble model.**
+
+Thank [Houtao Deng](https://www.linkedin.com/in/houtao-d-48902711/) for the inTrees library
+
+
