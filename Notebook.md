@@ -3,6 +3,12 @@ XGBoost Explainability using inTrees
 Siddharth Jain
 24 June 2019
 
+### This R Notebook with code explains the usage of inTrees library using a sample dataset.
+
+### This library helps with interpreting a Extreme Gradient Boosting model in R, by creating simplified rules.
+
+Refer the Readme file of the repository to know more.
+
 ## Imports
 
 ``` r
