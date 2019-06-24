@@ -1,4 +1,4 @@
-library(inTrees)
+library('inTrees')
 library('dplyr')
 library('Matrix')
 shrooms = read.csv('mushrooms.csv')
@@ -22,7 +22,7 @@ sample = sample.split(shrooms, SplitRatio = 0.75)
 train1 = subset(shrooms, sample == TRUE)
 test1 = subset(shrooms, sample == FALSE)
 
-# Out output variable is in the first column (class)
+# Our output variable is in the first column (class)
 output_vector = train1[, 1]
 
 # For future accuracy testing
