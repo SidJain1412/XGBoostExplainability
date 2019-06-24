@@ -2,6 +2,8 @@ library('inTrees')
 library('dplyr')
 library('Matrix')
 library('caTools')
+library('xgboost')
+
 shrooms = read.csv('mushrooms.csv')
 shrooms = na.omit(shrooms)
 
