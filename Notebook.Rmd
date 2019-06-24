@@ -1,0 +1,12 @@
+---
+title: "Exploring Air Passengers Dataset"
+author: "Siddharth Jain"
+output: rmarkdown::github_document
+---
+
+
+
+```{r}
+plot(cars)
+```
+
