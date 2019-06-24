@@ -5,6 +5,11 @@
 #### In this R notebook I demonstrate how to use the inTrees library to interpret and uncover the basic rules influencing the decision trees.
 (or atleast my understanding of it)
 
+Flow of inTrees:
+
+![Flow Diagram](https://github.com/SidJain1412/XGBoostExplainability/blob/master/Model%20Explainability%20Flow.jpg "Flow Diagram")
+
+
 [Reference Paper](https://arxiv.org/abs/1408.5456 "Arxiv Link to Paper")
 
 [Documentation](https://rdrr.io/cran/inTrees/ "Rdrr link")
