@@ -1,9 +1,59 @@
-Exploring Air Passengers Dataset
+XGBoost Explainability using inTrees
 ================
 Siddharth Jain
+24 June 2019
+
+## Imports
 
 ``` r
-plot(cars)
+library('inTrees')
+library('dplyr')
+library('Matrix')
+library('caTools')
 ```
 
-![](Notebook_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
+## Reading the data
+
+``` r
+shrooms = read.csv('mushrooms.csv')
+```
+
+Omitting NA (empty) rows
+
+``` r
+shrooms = na.omit(shrooms)
+```
+
+**Our output is the class of the mushroom. Either edible (e) or
+poisonous (p)**
+
+Converting the class to
+characters
+
+``` r
+shrooms['class'] %>% mutate_if(is.factor, as.character) -> shrooms['class']
+```
+
+Converting the classes (‘p’/‘e’) to numeric value
+
+``` r
+a = 0
+for (i in unique(shrooms$class)) {
+  shrooms$class[shrooms$class == i] = a
+  a = a + 1
+}
+```
+
+Setting seed for our train/test split on the given dataset
+
+``` r
+set.seed(42)
+```
+
+**Splitting into train and test datasets (0.75 ratio)**
+
+``` r
+sample = sample.split(shrooms, SplitRatio = 0.75)
+train1 = subset(shrooms, sample == TRUE)
+test1 = subset(shrooms, sample == FALSE)
+```
