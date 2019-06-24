@@ -173,4 +173,7 @@ knitr::kable(Simp_Learner, floating.environment="sidewaystable")
 
 Thank [Houtao Deng](https://www.linkedin.com/in/houtao-d-48902711/) for the inTrees library
 
-
+## inTrees flow diagram (made by me):
+```{r pressure, echo=FALSE, fig.cap="Flow of XGBoost Model Explainability", out.width = '100%'}
+knitr::include_graphics("Model Explainability Flow.jpg")
+```

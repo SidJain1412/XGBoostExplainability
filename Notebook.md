@@ -267,4 +267,9 @@ knitr::kable(Simp_Learner, floating.environment="sidewaystable")
 defining a decision for an XGBoost ensemble model.**
 
 Thank [Houtao Deng](https://www.linkedin.com/in/houtao-d-48902711/) for
-the inTrees library
+the inTrees
+library
+
+## inTrees flow diagram (made by me):
+
+<img src="Model Explainability Flow.jpg" title="Flow of XGBoost Model Explainability" alt="Flow of XGBoost Model Explainability" width="100%" />
