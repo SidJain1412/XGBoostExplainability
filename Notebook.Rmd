@@ -105,7 +105,7 @@ We can use feature importance, and also use inTrees to see the exact rules that 
 ```{r}
 importance <-
   xgb.importance(feature_names = colnames(data.matrix(train1[, -1])), model = xgbmodel)
-print(head(importance))
+knitr::kable(head(importance), floating.environment="sidewaystable")
 ```
 
 

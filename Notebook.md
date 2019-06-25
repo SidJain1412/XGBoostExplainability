@@ -149,16 +149,17 @@ rules that are defining the tree ensemble used by XGBoost.
 ``` r
 importance <-
   xgb.importance(feature_names = colnames(data.matrix(train1[, -1])), model = xgbmodel)
-print(head(importance))
+knitr::kable(head(importance), floating.environment="sidewaystable")
 ```
 
-    ##              Feature       Gain      Cover  Frequency
-    ## 1:        gill.color 0.28780570 0.15421114 0.05952381
-    ## 2: spore.print.color 0.19909662 0.15114041 0.13095238
-    ## 3:              odor 0.19868380 0.24468389 0.28571429
-    ## 4:        population 0.14206203 0.07225213 0.07142857
-    ## 5:         gill.size 0.10817059 0.11596370 0.08333333
-    ## 6:      gill.spacing 0.01320549 0.01994578 0.04761905
+| Feature           |      Gain |     Cover | Frequency |
+| :---------------- | --------: | --------: | --------: |
+| gill.color        | 0.2878057 | 0.1542111 | 0.0595238 |
+| spore.print.color | 0.1990966 | 0.1511404 | 0.1309524 |
+| odor              | 0.1986838 | 0.2446839 | 0.2857143 |
+| population        | 0.1420620 | 0.0722521 | 0.0714286 |
+| gill.size         | 0.1081706 | 0.1159637 | 0.0833333 |
+| gill.spacing      | 0.0132055 | 0.0199458 | 0.0476190 |
 
 ## Using inTrees
 
